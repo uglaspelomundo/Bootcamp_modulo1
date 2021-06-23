@@ -104,25 +104,26 @@ function checkProjectExists(req, res, next) {
   const project = projects.find(x => x.id == id);
 
   if (!project) {
-    return res.status(400).json({ error: 'Project not found' });
+    return res.status(400).json({ error: 'Projeto não existe' });
   }
 
   return next();
 }
 
-// function logRequest(req, res, next) {
-//   numeroRequest++;
+function checkProjectDuplicate(req, res, next) {
+  const id = req.body.id;
+  const project = projects.find(x => x.id == id)
 
-//   console.log(`Numero de request: ${numeroRequest}`);
+  if (project) {
+    return res.status(400).json({ error: 'Projeto já existe' });
+  }
 
-//   return next()
-// }
-
-// server.use(logRequest);
+  return next();
+}
 
 
 // Criar Projeto
-server.post('/projects', (req, res) => {
+server.post('/projects', checkProjectDuplicate, (req, res) => {
   const { id, title } = req.body;
 
   const project = {
@@ -176,7 +177,7 @@ server.delete('/projects/:id', checkProjectExists, (req, res) => {
 
   projects.splice(projectIndex, 1)
 
-  return res.send("usuario excluido com sucesso")
+  return res.send("projeto excluido com sucesso")
 });
 
 
